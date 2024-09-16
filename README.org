@@ -68,3 +68,17 @@ Autocompletion is the main use case for now. Chat is just a stub.
 - `M-x cody-login` will start Cody up and apply it to applicable buffers.
 - `M-x cody-logout` shuts Cody down.
 - `M-x cody-mode` toggles Cody on and off in a given buffer.
+
+* PREVIEW gptel support
+
+We have an experimental backend for [[https://github.com/karthink/gptel][gptel]].
+
+#+begin_src emacs-lisp
+  (require 'gptel-cody)
+
+  ;; Set Cody as the default backend
+  (setq gptel-backend
+        (gptel-make-cody "Cody"
+          :key "sgp_ADD_DOTCOM_TOKEN_HERE"
+          :stream t))
+#+end_src
