@@ -104,15 +104,17 @@ MAX-ENTRIES is the number of queries/responses to include for context."
           (protocol "https")
           (endpoint "/.api/completions/stream")
           (stream t)
-          (models '("anthropic/claude-3-5-sonnet-20240620"
-                    "anthropic/claude-3-opus-20240229"
-                    "openai/gpt-4o"
-                    "google/gemini-1.5-pro"
-                    "openai/cody-chat-preview-001"
-                    "openai/cody-chat-preview-002"
-                    "google/gemini-1.5-flash"
-                    "anthropic/claude-3-haiku-20240307"
-                    "fireworks/accounts/fireworks/models/mixtral-8x7b-instruct"))
+          (models (if (string= host "sourcegraph.com")
+                      '("anthropic/claude-3-5-sonnet-20240620"
+                        "anthropic/claude-3-opus-20240229"
+                        "openai/gpt-4o"
+                        "google/gemini-1.5-pro"
+                        "openai/cody-chat-preview-001"
+                        "openai/cody-chat-preview-002"
+                        "google/gemini-1.5-flash"
+                        "anthropic/claude-3-haiku-20240307"
+                        "fireworks/accounts/fireworks/models/mixtral-8x7b-instruct")
+                    '("anthropic::2023-06-01::claude-3.5-sonnet")))
           (key 'gptel-api-key)
           curl-args)
   "Create a Cody API backend for gptel.

@@ -79,9 +79,17 @@ We have an experimental backend for [[https://github.com/karthink/gptel][gptel]]
   ;; Set Cody as the default backend
   (setq gptel-backend
         (gptel-make-cody "Cody"
-          :key "sgp_ADD_DOTCOM_TOKEN_HERE"
-          :stream t))
+          :key "sgp_ADD_DOTCOM_TOKEN_HERE"))
+
+  ;; Or use against enterprise instance
+  (setq gptel-backend
+        (gptel-make-cody "Cody"
+          :host "sourcegraph.sourcegraph.com"
+          :key "sgp_TOKEN_HERE"))
 #+end_src
+
+You can have multiple cody accounts by giving the backends different names. IE
+replace the word "Cody" with the name you want to refer to it by.
 
 ** DONE ensure model selection works
 Right now I think I am just hardcoding it at request time.
@@ -90,6 +98,7 @@ As follow-up need to handle errors querying the backend to find out which
 models are allowed by the logged in user.
 
 ** DONE cody system prompt
+** DONE make it possible to change instance (test against s2)
 ** TODO remote prompts
 
 #+begin_src graphql
@@ -132,7 +141,6 @@ the transcript being
 #+end_example
 
 This lead to a failure from the server.
-** TODO make it possible to change instance (test against s2)
 ** TODO see if we can plug into same auth source
 Maybe also parse vscode state? Right now it is all in a sqlite file.
 ** TODO enhanced context for enterprise
