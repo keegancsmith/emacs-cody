@@ -83,8 +83,11 @@ We have an experimental backend for [[https://github.com/karthink/gptel][gptel]]
           :stream t))
 #+end_src
 
-** TODO ensure model selection works
+** DONE ensure model selection works
 Right now I think I am just hardcoding it at request time.
+
+As follow-up need to handle errors querying the backend to find out which
+models are allowed by the logged in user.
 
 ** TODO cody system prompts
 
@@ -93,6 +96,11 @@ Right now I think I am just hardcoding it at request time.
 Maybe also parse vscode state? Right now it is all in a sqlite file.
 ** TODO enhanced context for enterprise
 [[file:context-discussion.md][context-discussions.md]]
+** TODO handle errors from backend
 ** TODO model list from backend?
 I think we have this sort of functionality, but I do see a lot of hardcoding
 in the cody client.
+
+This should be possible, since I just tried with a random model on my free
+account and got this response from the backend
+: the requested chat model is not available ("openai/gpt-4o", onProTier=false, hasFeatureFlags=false)

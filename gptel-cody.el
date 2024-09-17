@@ -46,16 +46,16 @@
 
 (cl-defmethod gptel--request-data ((_backend gptel-cody) prompts)
   "Prepare REQUEST-DATA for Cody API."
-  `(:model "anthropic/claude-3-5-sonnet-20240620"
-           :messages ,(vconcat prompts)
-           :maxTokensToSample ,(or gptel-max-tokens 4000)
-           :temperature ,(or gptel-temperature 0)
-           :topK -1
-           :topP -1
-           :stopSequences ["</CODE5711>"]
-           :stream ,(or (and gptel-stream gptel-use-curl
-                             (gptel-backend-stream gptel-backend))
-                        :json-false)))
+  `(:model ,gptel-model
+    :messages ,(vconcat prompts)
+    :maxTokensToSample ,(or gptel-max-tokens 4000)
+    :temperature ,(or gptel-temperature 0)
+    :topK -1
+    :topP -1
+    :stopSequences ["</CODE5711>"]
+    :stream ,(or (and gptel-stream gptel-use-curl
+                      (gptel-backend-stream gptel-backend))
+                 :json-false)))
 
 (cl-defmethod gptel--parse-buffer ((_backend gptel-cody) &optional max-entries)
   "Parse current buffer backwards from point and return a list of prompts.
