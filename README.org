@@ -82,3 +82,17 @@ We have an experimental backend for [[https://github.com/karthink/gptel][gptel]]
           :key "sgp_ADD_DOTCOM_TOKEN_HERE"
           :stream t))
 #+end_src
+
+** TODO ensure model selection works
+Right now I think I am just hardcoding it at request time.
+
+** TODO cody system prompts
+
+** TODO make it possible to change instance (test against s2)
+** TODO see if we can plug into same auth source
+Maybe also parse vscode state? Right now it is all in a sqlite file.
+** TODO enhanced context for enterprise
+[[file:context-discussion.md][context-discussions.md]]
+** TODO model list from backend?
+I think we have this sort of functionality, but I do see a lot of hardcoding
+in the cody client.
