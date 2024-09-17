@@ -97,8 +97,6 @@ MAX-ENTRIES is the number of queries/responses to include for context."
           (header (lambda ()
                     (when-let (key (gptel--get-api-key))
                       `(("Authorization" . ,(concat "token " key))
-                        ("Content-Type" . "application/json")
-                        ("Accept-Encoding" . "gzip;q=0")
                         ("User-Agent" . "Cody-Emacs-gptel/0.0.1-dev")))))
           (host "sourcegraph.com")
           (protocol "https")
