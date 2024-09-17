@@ -84,6 +84,13 @@ MAX-ENTRIES is the number of queries/responses to include for context."
                 :text gptel--system-message)
           prompts)))
 
+(cl-defun gptel-cody-add-directive ()
+  "Add the Cody directive to the end of `gptel-directives` if missing."
+  (unless (assq 'cody gptel-directives)
+    (customize-set-variable 'gptel-directives
+                            (append gptel-directives
+                                    '((cody . "You are Cody, an AI coding assistant from Sourcegraph. If your answer contains fenced code blocks in Markdown, include the relevant full file path in the code block tag using this structure: ```$LANGUAGE:$FILEPATH```"))))))
+
 ;;;###autoload
 (cl-defun gptel-make-cody
     (name &key
@@ -132,6 +139,7 @@ alist.
 
 KEY (optional) is a variable whose value is the API key, or
 function that returns the key."
+  (gptel-cody-add-directive)
   (declare (indent 1))
   (let ((backend (gptel--make-cody
                   :curl-args curl-args
