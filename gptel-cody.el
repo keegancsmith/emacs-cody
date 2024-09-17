@@ -99,7 +99,7 @@ MAX-ENTRIES is the number of queries/responses to include for context."
                       `(("Authorization" . ,(concat "token " key))
                         ("Content-Type" . "application/json")
                         ("Accept-Encoding" . "gzip;q=0")
-                        ("User-Agent" . "edit / v1")))))
+                        ("User-Agent" . "Cody-Emacs-gptel/0.0.1-dev")))))
           (host "sourcegraph.com")
           (protocol "https")
           (endpoint "/.api/completions/stream")
@@ -151,7 +151,7 @@ function that returns the key."
                   :protocol protocol
                   :endpoint endpoint
                   :stream stream
-                  :url (concat protocol "://" host endpoint "?api-version=2&client-name=gptel&client-version=v1"))))
+                  :url (concat protocol "://" host endpoint "?api-version=2&client-name=Cody-Emacs-gptel&client-version=0.0.1-dev"))))
     (setf (alist-get name gptel--known-backends
                      nil nil #'equal)
           backend)))
