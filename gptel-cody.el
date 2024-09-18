@@ -28,6 +28,37 @@
                           (:copier nil)
                           (:include gptel-backend)))
 
+(cl-defmethod gptel-cody-fetch-models-async ((backend gptel-cody))
+  "Asynchronously fetch models for the Cody backend and update the models slot."
+  (let* ((host (gptel-backend-host backend))
+         (url (format "https://%s/.api/modelconfig/supported-models.json" host))
+         (url-request-method "GET")
+         (url-request-extra-headers
+          (funcall (gptel-backend-header backend))))
+    (url-retrieve
+     url
+     (lambda (status)
+       (if-let ((err (plist-get status :error)))
+           (message "Error fetching Cody models: %s" err)
+         (goto-char (point-min))
+         (re-search-forward "\n\n")
+         (let* ((json-object-type 'alist)
+                (json-array-type 'list)
+                (json-key-type 'symbol)
+                (response (json-read))
+                (default-chat-model (cdr (assoc 'chat (cdr (assoc 'defaultModels response)))))
+                (all-models (cdr (assoc 'models response)))
+                (chat-models (seq-filter
+                              (lambda (model)
+                                (and (member "chat" (cdr (assoc 'capabilities model)))
+                                     (not (string-match-p "fast-edit" (cdr (assoc 'modelRef model))))))
+                              all-models))
+                (chat-models-names (mapcar (lambda (model) (cdr (assoc 'modelRef model))) chat-models))
+                (chat-models-names (cons default-chat-model (remove default-chat-model chat-models-names))))
+           (setf (gptel-cody-models backend) chat-models-names)
+           (message "Updated %s models: %s" (gptel-backend-name backend) chat-models-names))))
+     nil t t)))
+
 (cl-defmethod gptel-curl--parse-stream ((_backend gptel-cody) _info)
   "Parse Cody's streaming response."
   (let ((content-strs))
@@ -102,17 +133,7 @@ MAX-ENTRIES is the number of queries/responses to include for context."
           (protocol "https")
           (endpoint "/.api/completions/stream")
           (stream t)
-          (models (if (string= host "sourcegraph.com")
-                      '("anthropic/claude-3-5-sonnet-20240620"
-                        "anthropic/claude-3-opus-20240229"
-                        "openai/gpt-4o"
-                        "google/gemini-1.5-pro"
-                        "openai/cody-chat-preview-001"
-                        "openai/cody-chat-preview-002"
-                        "google/gemini-1.5-flash"
-                        "anthropic/claude-3-haiku-20240307"
-                        "fireworks/accounts/fireworks/models/mixtral-8x7b-instruct")
-                    '("anthropic::2023-06-01::claude-3.5-sonnet")))
+          (models nil)
           (key 'gptel-api-key)
           curl-args)
   "Create a Cody API backend for gptel.
@@ -147,11 +168,15 @@ function that returns the key."
                   :host host
                   :header header
                   :key key
-                  :models models
+                  :models (or models (if (string= host "sourcegraph.com")
+                                         '("anthropic/claude-3-5-sonnet-20240620")
+                                       '("anthropic::2023-06-01::claude-3.5-sonnet")))
                   :protocol protocol
                   :endpoint endpoint
                   :stream stream
                   :url (concat protocol "://" host endpoint "?api-version=2&client-name=Cody-Emacs-gptel&client-version=0.0.1-dev"))))
+    ;; using default models, so fetch from remote.
+    (unless models (gptel-cody-fetch-models-async backend))
     (setf (alist-get name gptel--known-backends
                      nil nil #'equal)
           backend)))

@@ -86,6 +86,12 @@ We have an experimental backend for [[https://github.com/karthink/gptel][gptel]]
         (gptel-make-cody "Cody"
           :host "sourcegraph.sourcegraph.com"
           :key "sgp_TOKEN_HERE"))
+
+  ;; Specify models to avoid request against server to fetch list of models
+  (setq gptel-backend (gptel-make-cody "Cody"
+                      :host "sourcegraph.sourcegraph.com"
+                      :key "sgp_TOKEN_HERE"
+                      :models '("anthropic::2023-06-01::claude-3.5-sonnet")))
 #+end_src
 
 You can have multiple cody accounts by giving the backends different names. IE
@@ -99,6 +105,13 @@ models are allowed by the logged in user.
 
 ** DONE cody system prompt
 ** DONE make it possible to change instance (test against s2)
+** DONE model list from backend?
+I think we have this sort of functionality, but I do see a lot of hardcoding
+in the cody client.
+
+This should be possible, since I just tried with a random model on my free
+account and got this response from the backend
+: the requested chat model is not available ("openai/gpt-4o", onProTier=false, hasFeatureFlags=false)
 ** TODO remote prompts
 
 #+begin_src graphql
@@ -146,10 +159,3 @@ Maybe also parse vscode state? Right now it is all in a sqlite file.
 ** TODO enhanced context for enterprise
 [[file:context-discussion.md][context-discussions.md]]
 ** TODO handle errors from backend
-** TODO model list from backend?
-I think we have this sort of functionality, but I do see a lot of hardcoding
-in the cody client.
-
-This should be possible, since I just tried with a random model on my free
-account and got this response from the backend
-: the requested chat model is not available ("openai/gpt-4o", onProTier=false, hasFeatureFlags=false)
