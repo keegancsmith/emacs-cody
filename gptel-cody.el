@@ -128,16 +128,16 @@ MAX-ENTRIES is the number of queries/responses to include for context."
 ;;;###autoload
 (cl-defun gptel-make-cody
     (name &key
-          (header (lambda ()
-                    (when-let (key (gptel--get-api-key))
-                      `(("Authorization" . ,(concat "token " key))
-                        ("User-Agent" . ,gptel-cody--user-agent)))))
           (host "sourcegraph.com")
           (protocol "https")
           (endpoint "/.api/completions/stream")
           (stream t)
           (models nil)
           (key 'gptel-api-key)
+          (header (lambda ()
+                    (when-let (key-resolved (gptel--get-api-key key))
+                      `(("Authorization" . ,(concat "token " key-resolved))
+                        ("User-Agent" . ,gptel-cody--user-agent)))))
           curl-args)
   "Create a Cody API backend for gptel.
 
