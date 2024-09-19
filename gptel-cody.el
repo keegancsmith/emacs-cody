@@ -3,26 +3,29 @@
 ;; Copyright (C) 2024 Sourcegraph
 
 ;; Author: Keegan Carruthers-Smith <keegan.csmith@gmail.com>
+;; Version: 0.0.1-alpha
+;; Package-Requires: ((emacs "27.1") (gptel "0.9.0"))
+;; Keywords: convenience
+;; URL: https://github.com/sourcegraph/gptel-cody
 
-;; This program is free software; you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+;; SPDX-License-Identifier: Apache-2.0
 
 ;;; Commentary:
-
 ;; This file adds support for the Cody API to gptel
 
 ;;; Code:
 (require 'gptel)
+
+(defconst gptel-cody--client-name "Cody-Emacs-gptel"
+  "The client name for Cody API requests.")
+
+(defconst gptel-cody--version
+  (package-get-version)
+  "The version of gptel-cody package.")
+
+(defconst gptel-cody--user-agent
+  (format "%s/%s" gptel-cody--client-name gptel-cody--version)
+  "The User-Agent string for Cody API requests.")
 
 (cl-defstruct (gptel-cody (:constructor gptel--make-cody)
                           (:copier nil)
@@ -128,7 +131,7 @@ MAX-ENTRIES is the number of queries/responses to include for context."
           (header (lambda ()
                     (when-let (key (gptel--get-api-key))
                       `(("Authorization" . ,(concat "token " key))
-                        ("User-Agent" . "Cody-Emacs-gptel/0.0.1-dev")))))
+                        ("User-Agent" . ,gptel-cody--user-agent)))))
           (host "sourcegraph.com")
           (protocol "https")
           (endpoint "/.api/completions/stream")
@@ -174,7 +177,7 @@ function that returns the key."
                   :protocol protocol
                   :endpoint endpoint
                   :stream stream
-                  :url (concat protocol "://" host endpoint "?api-version=2&client-name=Cody-Emacs-gptel&client-version=0.0.1-dev"))))
+                  :url (concat protocol "://" host endpoint "?api-version=2&client-name=" gptel-cody--client-name "&client-version=" gptel-cody--version))))
     ;; using default models, so fetch from remote.
     (unless models (gptel-cody-fetch-models-async backend))
     (setf (alist-get name gptel--known-backends
