@@ -59,7 +59,7 @@ You can create a Sourcegraph access token at https://sourcegraph.com/users/yourn
     (setopt cody-workspace-root "/your/path/to/some/project/dir") ; optional
     :config
     (defalias 'cody-start 'cody-login))
-#+end_src  
+#+end_src
 
 * Available commands
 
@@ -68,3 +68,94 @@ Autocompletion is the main use case for now. Chat is just a stub.
 - `M-x cody-login` will start Cody up and apply it to applicable buffers.
 - `M-x cody-logout` shuts Cody down.
 - `M-x cody-mode` toggles Cody on and off in a given buffer.
+
+* PREVIEW gptel support
+
+We have an experimental backend for [[https://github.com/karthink/gptel][gptel]].
+
+#+begin_src emacs-lisp
+  (require 'gptel-cody)
+
+  ;; Set Cody as the default backend
+  (setq gptel-backend
+        (gptel-make-cody "Cody"
+          :key "sgp_ADD_DOTCOM_TOKEN_HERE"))
+
+  ;; Or use against enterprise instance
+  (setq gptel-backend
+        (gptel-make-cody "Cody"
+          :host "sourcegraph.sourcegraph.com"
+          :key "sgp_TOKEN_HERE"))
+
+  ;; Specify models to avoid request against server to fetch list of models
+  (setq gptel-backend (gptel-make-cody "Cody"
+                      :host "sourcegraph.sourcegraph.com"
+                      :key "sgp_TOKEN_HERE"
+                      :models '("anthropic::2023-06-01::claude-3.5-sonnet")))
+#+end_src
+
+You can have multiple cody accounts by giving the backends different names. IE
+replace the word "Cody" with the name you want to refer to it by.
+
+** DONE ensure model selection works
+Right now I think I am just hardcoding it at request time.
+
+As follow-up need to handle errors querying the backend to find out which
+models are allowed by the logged in user.
+
+** DONE cody system prompt
+** DONE make it possible to change instance (test against s2)
+** DONE model list from backend?
+I think we have this sort of functionality, but I do see a lot of hardcoding
+in the cody client.
+
+This should be possible, since I just tried with a random model on my free
+account and got this response from the backend
+: the requested chat model is not available ("openai/gpt-4o", onProTier=false, hasFeatureFlags=false)
+** TODO remote prompts
+
+#+begin_src graphql
+  query ViewerPrompts($query: String!) {
+      prompts(query: $query, first: 100, viewerIsAffiliated: true, orderBy: PROMPT_NAME_WITH_OWNER) {
+          nodes {
+              id
+              name
+              nameWithOwner
+              owner {
+                  namespaceName
+              }
+              description
+              draft
+              definition {
+                  text
+              }
+              url
+          }
+          totalCount
+          pageInfo {
+              hasNextPage
+              endCursor
+          }
+      }
+  }
+#+end_src
+
+** TODO handle empty text
+
+I don't know if this is a bug in gptel or strictness on Cody's side. But I set
+a directive without having inline prose, and we ended up having a final bit of
+the transcript being
+
+#+begin_example
+    {
+      "speaker": "human",
+      "text": ""
+    }
+#+end_example
+
+This lead to a failure from the server.
+** TODO see if we can plug into same auth source
+Maybe also parse vscode state? Right now it is all in a sqlite file.
+** TODO enhanced context for enterprise
+[[file:context-discussion.md][context-discussions.md]]
+** TODO handle errors from backend
