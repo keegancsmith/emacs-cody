@@ -2483,7 +2483,7 @@ With a prefix argument, stops the current webserver (for development)."
 
 (defun cody--websocket-handler-open (ws request)
   "Handle WebSocket connection opening."
-  (message "Got `cody--websocket-handler-open'")
+  (cody--log "Got `cody--websocket-handler-open'")
   (let* ((id (cody--extract-id-from-websocket-request request))
          (panel (gethash id cody--chat-panels)))
     (if (and panel (null (cody--chat-connection-ready panel)))
@@ -2492,7 +2492,7 @@ With a prefix argument, stops the current webserver (for development)."
           (setf (cody--chat-connection-websocket panel) ws)
           (setf (cody--chat-connection-ready panel) t)
           (cody--send-buffered-data panel))
-      (cody--log "Warning: No ready panel avaialble with open."))))
+      (cody--log "Warning: No ready panel available with open."))))
 
 (defun cody--websocket-handler-message (ws frame)
   "Handle incoming WebSocket messages."
@@ -2519,7 +2519,7 @@ With a prefix argument, stops the current webserver (for development)."
 
 (defun cody--handle-websocket-message (ws frame)
   "Handle incoming WebSocket message by queuing it."
-  (message "Queueing message: %s %s" ws frame)
+  (cody--log "Queueing message: %s %s" ws frame)
   (push (cons ws frame) cody--message-queue)
   (cody--process-message-queue))
 
@@ -2541,7 +2541,7 @@ With a prefix argument, stops the current webserver (for development)."
 
 (defun cody--process-single-message (ws frame)
   "Process a single websocket message."
-  (message "Processing message: %s %s" ws frame)
+  (cody--log "Processing message: %s %s" ws frame)
   (let* ((json-object-type 'plist)
          (data (json-read-from-string frame))
          (what (plist-get data :what))
@@ -2551,7 +2551,7 @@ With a prefix argument, stops the current webserver (for development)."
       (cody--request 'webview/receiveMessageStringEncoded payload))
      (t
       (cody--log "Unknown message type: %s" what))))
-  (message "Finished processing message: %s" frame))
+  (cody--log "Finished processing message: %s" frame))
 
 (defun cody--create-chat-panel (id)
   "Create a new chat panel connection."
